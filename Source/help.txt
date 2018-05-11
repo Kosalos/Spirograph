@@ -1,10 +1,13 @@
 Spirograph
-
 3D spirograph uses Metal to calculate the data points.
 
 All the widget boxes work the same way:
 Press and hold to either side of center to affect the parameter in the specified direction and speed.
-Tap on a widget to zero it's parameters.
+
+* Double Tap on a widget to toggle fast vs. slow parameter control.
+  (red vs. green background shows  fast vs. slow).
+
+* Triple Tap to zero it's parameters.
 
 R,S control the size and speed of a point rotating round a clock face.
 X,Y control the rate at which the clock face itself is slowly spinning.
@@ -15,6 +18,7 @@ C. "A" toggles gear active / inactive.
 D. "H" alters parameters to nearest 'harmonic value'.  Sort of works...
 
 1600 points are calculated, and connected by lines.
+(with the GPU we COULD be doing 100,000 points, but the image gets too dense).
 
 Assuming all 4 gears are active:
 The first gear determines where the point is in relation to the center of the image.

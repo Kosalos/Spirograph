@@ -6,37 +6,8 @@ var arcBall = ArcBall()
 
 extension float3x3 {
     static let identity: float3x3 = matrix_identity_float3x3
-}
 
-extension float3 {
-    var length: Float {
-        return simd.length(self)
-    }
-}
-
-class ArcBall {
-    var transformMatrix = float4x4()
-    var startPosition = float3x3()
-    var endPosition = float3x3()
-    var startVertex = float3()
-    var endVertex = float3()
-    var adjustWidth = Float()
-    var adjustHeight = Float()
-    var width = Float()
-    var height = Float()
-
-    func initialize(_ newWidth:Float, _ newHeight:Float) {
-        width = newWidth
-        height = newHeight
-        transformMatrix = float4x4(diagonal:[1,1,1,1])
-        startPosition = .identity
-        endPosition = .identity
-        transformMatrix = copyMatrixToQuaternion(transformMatrix,endPosition)
-        adjustWidth  = 1 / ((newWidth  - 1) * 0.5)
-        adjustHeight = 1 / ((newHeight - 1) * 0.5)
-    }
-
-    func quaternionToMatrix(_ q1:float4) -> float3x3 {
+    init(quaternion q1: float4) {
         let n:Float = (q1.x * q1.x) + (q1.y * q1.y) + (q1.z * q1.z) + (q1.w * q1.w)
         let s:Float = (n > 0) ? (2 / n) : 0
         let xs:Float = q1.x * s
@@ -58,7 +29,42 @@ class ArcBall {
 
         var ans = float3x3()
         ans.columns = (c0,c1,c2)
-        return ans
+        self = ans
+    }
+}
+
+extension float4x4 {
+    static let identity: float4x4 = matrix_identity_float4x4
+
+
+}
+
+extension float3 {
+    var length: Float {
+        return simd.length(self)
+    }
+}
+
+class ArcBall {
+    private(set) var transformMatrix = float4x4()
+    private(set) var startPosition = float3x3()
+    private(set) var endPosition = float3x3()
+    private(set) var startVertex = float3()
+    private(set) var endVertex = float3()
+    private(set) var adjustWidth = Float()
+    private(set) var adjustHeight = Float()
+    private(set) var width = Float()
+    private(set) var height = Float()
+
+    func initialize(_ newWidth:Float, _ newHeight:Float) {
+        width = newWidth
+        height = newHeight
+        transformMatrix = .identity
+        startPosition = .identity
+        endPosition = .identity
+        transformMatrix = copyMatrixToQuaternion(transformMatrix,endPosition)
+        adjustWidth  = 1 / ((newWidth  - 1) * 0.5)
+        adjustHeight = 1 / ((newHeight - 1) * 0.5)
     }
 
     func copyMatrixToQuaternion(_ oldQuat:float4x4,_ m1:float3x3) -> float4x4 {
@@ -120,7 +126,7 @@ class ArcBall {
             newRot.w = dot(startVertex, endVertex)
         }
 
-        endPosition = quaternionToMatrix(newRot) * startPosition
+        endPosition = float3x3(quaternion: newRot) * startPosition
         transformMatrix = copyMatrixToQuaternion(transformMatrix,endPosition)
     }
 }

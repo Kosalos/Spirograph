@@ -42,6 +42,28 @@ class Renderer: NSObject, MTKViewDelegate {
         }
     }
 
+    class func buildMetalVertexDescriptor() -> MTLVertexDescriptor {
+        let mtlVertexDescriptor = MTLVertexDescriptor()
+        
+        mtlVertexDescriptor.attributes[0].format = MTLVertexFormat.float3   // pos
+        mtlVertexDescriptor.attributes[0].offset = 0
+        mtlVertexDescriptor.attributes[0].bufferIndex = 0
+        
+        mtlVertexDescriptor.attributes[1].format = MTLVertexFormat.float2   // txt
+        mtlVertexDescriptor.attributes[1].offset = 0
+        mtlVertexDescriptor.attributes[1].bufferIndex = 1
+        
+        mtlVertexDescriptor.layouts[0].stride = 12
+        mtlVertexDescriptor.layouts[0].stepRate = 1
+        mtlVertexDescriptor.layouts[0].stepFunction = MTLVertexStepFunction.perVertex
+        
+        mtlVertexDescriptor.layouts[1].stride = 8
+        mtlVertexDescriptor.layouts[1].stepRate = 1
+        mtlVertexDescriptor.layouts[1].stepFunction = MTLVertexStepFunction.perVertex
+        
+        return mtlVertexDescriptor
+    }
+
     final class DepthStencilDescriptor : MTLDepthStencilDescriptor {
         override init() {
             super.init()
@@ -68,7 +90,8 @@ class Renderer: NSObject, MTKViewDelegate {
         metalKitView.colorPixelFormat = .bgra8Unorm_srgb
         metalKitView.sampleCount = 1
 
-        let mtlVertexDescriptor = VertexDescriptor()
+//        let mtlVertexDescriptor = VertexDescriptor()
+        let mtlVertexDescriptor = Renderer.buildMetalVertexDescriptor()
 
         do {
             pipelineState = try Renderer.buildRenderPipelineWithDevice(device: gDevice,
@@ -79,7 +102,10 @@ class Renderer: NSObject, MTKViewDelegate {
             return nil
         }
 
-        let depthStateDesciptor = DepthStencilDescriptor()
+//        let depthStateDesciptor = DepthStencilDescriptor()
+        let depthStateDesciptor = MTLDepthStencilDescriptor()
+        depthStateDesciptor.depthCompareFunction = MTLCompareFunction.less
+        depthStateDesciptor.isDepthWriteEnabled = true
 
         guard let state = gDevice.makeDepthStencilState(descriptor:depthStateDesciptor) else { return nil }
         depthState = state

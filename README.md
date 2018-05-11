@@ -8,4 +8,6 @@ Written mostly as a way to practice a new way of getting Swift to access arrays 
 You can see the result in Spriograph.h and .m\
 Not perfect, but it least workable.
 
+Hope someone can show me a better/efficient/elegant way.
+
 ![Screenshot](screenshot.png)

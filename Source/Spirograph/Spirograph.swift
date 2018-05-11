@@ -12,7 +12,7 @@ class Spirograph {
     var pipeLine:MTLComputePipelineState! = nil
     var numThreadgroups2 = MTLSize()
     var threadsPerGroup2 = MTLSize()
-    
+
     init() {
         sControl.sectionCount = Int32(sectionCount)
         sControl.pointsPerSection = Int32(pointsPerSection)
@@ -21,10 +21,10 @@ class Spirograph {
         commandQueue = gDevice.makeCommandQueue()!
         cBuffer = gDevice?.makeBuffer(length:MemoryLayout<SpirographControl>.stride, options:.storageModeShared)
         vBuffer = gDevice?.makeBuffer(length: numVertex * MemoryLayout<TVertex>.stride, options:.storageModeShared)
-        
+
         reset()
     }
-    
+
     //MARK: -
 
     func reset() {
@@ -38,16 +38,16 @@ class Spirograph {
         if pipeLine == nil {
             func buildPipeline(_ shaderFunction:String) -> MTLComputePipelineState {
                 var result:MTLComputePipelineState!
-                
+
                 do {
                     let defaultLibrary = gDevice?.makeDefaultLibrary()
                     let prg = defaultLibrary?.makeFunction(name:shaderFunction)
                     result = try gDevice?.makeComputePipelineState(function: prg!)
                 } catch { fatalError("Failed to setup " + shaderFunction) }
-                
+
                 return result
             }
-            
+
             pipeLine = buildPipeline("calcSpirographShader")
             let threadExecutionWidth = pipeLine.threadExecutionWidth
             let ntg = Int(ceil(Float(sControl.sectionCount)/Float(threadExecutionWidth)))

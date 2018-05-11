@@ -7,7 +7,7 @@ var sControl = SpirographControl()
 
 class ViewController: UIViewController {
     var timer = Timer()
-    
+
     @IBOutlet var mtkViewL: MTKView!
     @IBOutlet var mtkViewR: MTKView!
     var rendererL: Renderer!
@@ -23,7 +23,7 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         gDevice = MTLCreateSystemDefaultDevice()
         mtkViewL.device = gDevice
         mtkViewR.device = gDevice
@@ -32,13 +32,13 @@ class ViewController: UIViewController {
         rendererL = newRenderer
         rendererL.mtkView(mtkViewL, drawableSizeWillChange: mtkViewL.drawableSize)
         mtkViewL.delegate = rendererL
-        
+
         guard let newRenderer2 = Renderer(metalKitView: mtkViewR, 1) else { fatalError("Renderer cannot be initialized") }
         rendererR = newRenderer2
         rendererR.mtkView(mtkViewR, drawableSizeWillChange: mtkViewR.drawableSize)
         mtkViewR.delegate = rendererR
 
-        gList = [ gControl1,gControl2,gControl3,gControl4 ]        
+        gList = [ gControl1,gControl2,gControl3,gControl4 ]
         for (n, g) in gList.enumerated() { g.initialize(n) }
 
         spirograph.reset()
@@ -47,14 +47,14 @@ class ViewController: UIViewController {
         timer = Timer.scheduledTimer(timeInterval: 1.0/20.0, target:self, selector: #selector(timerHandler), userInfo: nil, repeats:true)
         NotificationCenter.default.addObserver(self, selector: #selector(self.rotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
     }
-    
+
     override var prefersStatusBarHidden: Bool { return true }
 
     @IBAction func resetPressed(_ sender: UIButton) {
         spirograph.reset()
         for g in gList { g.setNeedsDisplay() }
     }
-    
+
     //MARK: -
 
     @objc func rotated() {
@@ -63,7 +63,7 @@ class ViewController: UIViewController {
 
         var x = CGFloat()
         var y = CGFloat()
-        
+
         func frame(_ fxs:CGFloat, _ fys:CGFloat, _ dx:CGFloat, _ dy:CGFloat) -> CGRect {
             let r = CGRect(x:x, y:y, width:fxs, height:fys)
             x += dx; y += dy
@@ -78,19 +78,19 @@ class ViewController: UIViewController {
         for g in gList { g.frame = frame(170,100,180,0) }
         infoButton.frame = frame(40,40,0,50)
         resetButton.frame = frame(80,40,0,0)
-        
+
         let hk = mtkViewL.bounds
         arcBall.initialize(Float(hk.size.width),Float(hk.size.height))
     }
-    
+
     //MARK: -
-    
+
     @objc func timerHandler() {
         rotateImage(paceRotate.x,paceRotate.y)
     }
-    
+
     //MARK: -
-    
+
     var rotateCenter = CGPoint()
     var paceRotate = CGPoint()
 
@@ -100,37 +100,37 @@ class ViewController: UIViewController {
             rotateCenter.x = hk.size.width/2
             rotateCenter.y = hk.size.height/2
         }
-        
+
         arcBall.mouseDown(CGPoint(x: rotateCenter.x, y: rotateCenter.y))
         arcBall.mouseMove(CGPoint(x: rotateCenter.x + x, y: rotateCenter.y + y))
     }
-    
+
     func parseTranslation(_ pt:CGPoint) {
         let scale:Float = 0.01
         translation.x = Float(pt.x) * scale
         translation.y = -Float(pt.y) * scale
     }
-    
+
     func parseRotation(_ pt:CGPoint) {
         let scale:CGFloat = 0.51
         paceRotate.x = pt.x * scale
         paceRotate.y = pt.y * scale
     }
-    
+
     var numberPanTouches:Int = 0
-    
+
     @IBAction func panGesture(_ sender: UIPanGestureRecognizer) {
         let pt = sender.translation(in: self.view)
         let count = sender.numberOfTouches
         if count == 0 { numberPanTouches = 0 }  else if count > numberPanTouches { numberPanTouches = count }
-        
+
         switch sender.numberOfTouches {
         case 1 : if numberPanTouches < 2 { parseRotation(pt) } // prevent rotation after releasing translation
         case 2 : parseTranslation(pt)
         default : break
         }
     }
-    
+
     @IBAction func pinchGesture(_ sender: UIPinchGestureRecognizer) {
         let min:Float = 1
         let max:Float = 1000
@@ -138,7 +138,7 @@ class ViewController: UIViewController {
         if translation.z < min { translation.z = min }
         if translation.z > max { translation.z = max }
     }
-    
+
     @IBAction func tapGesture(_ sender: UITapGestureRecognizer) {
         paceRotate.x = 0
         paceRotate.y = 0

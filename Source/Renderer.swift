@@ -21,6 +21,35 @@ class Renderer: NSObject, MTKViewDelegate {
     var uniforms: UnsafeMutablePointer<Uniforms>
     var projectionMatrix: matrix_float4x4 = matrix_float4x4()
 
+    final class VertexDescriptor : MTLVertexDescriptor {
+        override init() {
+            super.init()
+            attributes[0].format = .float3   // pos
+            attributes[0].offset = 0
+            attributes[0].bufferIndex = 0
+
+            attributes[1].format = .float2   // txt
+            attributes[1].offset = 0
+            attributes[1].bufferIndex = 1
+
+            layouts[0].stride = 12
+            layouts[0].stepRate = 1
+            layouts[0].stepFunction = .perVertex
+
+            layouts[1].stride = 8
+            layouts[1].stepRate = 1
+            layouts[1].stepFunction = .perVertex
+        }
+    }
+
+    final class DepthStencilDescriptor : MTLDepthStencilDescriptor {
+        override init() {
+            super.init()
+            depthCompareFunction = .less
+            isDepthWriteEnabled = true
+        }
+    }
+
     init?(metalKitView: MTKView, _ mIdent:Int) {
         ident = mIdent
         guard let queue = gDevice.makeCommandQueue() else { return nil }
@@ -39,7 +68,7 @@ class Renderer: NSObject, MTKViewDelegate {
         metalKitView.colorPixelFormat = .bgra8Unorm_srgb
         metalKitView.sampleCount = 1
 
-        let mtlVertexDescriptor = Renderer.buildMetalVertexDescriptor()
+        let mtlVertexDescriptor = VertexDescriptor()
 
         do {
             pipelineState = try Renderer.buildRenderPipelineWithDevice(device: gDevice,
@@ -50,36 +79,12 @@ class Renderer: NSObject, MTKViewDelegate {
             return nil
         }
 
-        let depthStateDesciptor = MTLDepthStencilDescriptor()
-        depthStateDesciptor.depthCompareFunction = .less
-        depthStateDesciptor.isDepthWriteEnabled = true
+        let depthStateDesciptor = DepthStencilDescriptor()
 
         guard let state = gDevice.makeDepthStencilState(descriptor:depthStateDesciptor) else { return nil }
         depthState = state
 
         super.init()
-    }
-
-    class func buildMetalVertexDescriptor() -> MTLVertexDescriptor {
-        let mtlVertexDescriptor = MTLVertexDescriptor()
-
-        mtlVertexDescriptor.attributes[0].format = .float3   // pos
-        mtlVertexDescriptor.attributes[0].offset = 0
-        mtlVertexDescriptor.attributes[0].bufferIndex = 0
-
-        mtlVertexDescriptor.attributes[1].format = .float2   // txt
-        mtlVertexDescriptor.attributes[1].offset = 0
-        mtlVertexDescriptor.attributes[1].bufferIndex = 1
-
-        mtlVertexDescriptor.layouts[0].stride = 12
-        mtlVertexDescriptor.layouts[0].stepRate = 1
-        mtlVertexDescriptor.layouts[0].stepFunction = .perVertex
-
-        mtlVertexDescriptor.layouts[1].stride = 8
-        mtlVertexDescriptor.layouts[1].stepRate = 1
-        mtlVertexDescriptor.layouts[1].stepFunction = .perVertex
-
-        return mtlVertexDescriptor
     }
 
     class func buildRenderPipelineWithDevice(device: MTLDevice,
@@ -228,7 +233,3 @@ func rotate(_ a: Float, _ r: float3) -> float4x4 {
 func rotate(_ angle: Float, _ x: Float, _ y: Float, _ z: Float) -> float4x4 {
     return rotate(angle, float3(x: x, y: y, z: z))
 }
-
-
-
-

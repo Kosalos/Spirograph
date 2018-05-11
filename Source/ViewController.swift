@@ -45,7 +45,7 @@ class ViewController: UIViewController {
         rotated()
 
         timer = Timer.scheduledTimer(timeInterval: 1.0/20.0, target:self, selector: #selector(timerHandler), userInfo: nil, repeats:true)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.rotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.rotated), name: .UIDeviceOrientationDidChange, object: nil)
     }
 
     override var prefersStatusBarHidden: Bool { return true }

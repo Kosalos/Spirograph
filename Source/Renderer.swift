@@ -1,4 +1,3 @@
-import Metal
 import MetalKit
 import simd
 
@@ -36,8 +35,8 @@ class Renderer: NSObject, MTKViewDelegate {
         
         uniforms = UnsafeMutableRawPointer(dynamicUniformBuffer.contents()).bindMemory(to:Uniforms.self, capacity:1)
         
-        metalKitView.depthStencilPixelFormat = MTLPixelFormat.depth32Float_stencil8
-        metalKitView.colorPixelFormat = MTLPixelFormat.bgra8Unorm_srgb
+        metalKitView.depthStencilPixelFormat = .depth32Float_stencil8
+        metalKitView.colorPixelFormat = .bgra8Unorm_srgb
         metalKitView.sampleCount = 1
         
         let mtlVertexDescriptor = Renderer.buildMetalVertexDescriptor()
@@ -52,7 +51,7 @@ class Renderer: NSObject, MTKViewDelegate {
         }
         
         let depthStateDesciptor = MTLDepthStencilDescriptor()
-        depthStateDesciptor.depthCompareFunction = MTLCompareFunction.less
+        depthStateDesciptor.depthCompareFunction = .less
         depthStateDesciptor.isDepthWriteEnabled = true
         
         guard let state = gDevice.makeDepthStencilState(descriptor:depthStateDesciptor) else { return nil }
@@ -64,21 +63,21 @@ class Renderer: NSObject, MTKViewDelegate {
     class func buildMetalVertexDescriptor() -> MTLVertexDescriptor {
         let mtlVertexDescriptor = MTLVertexDescriptor()
         
-        mtlVertexDescriptor.attributes[0].format = MTLVertexFormat.float3   // pos
+        mtlVertexDescriptor.attributes[0].format = .float3   // pos
         mtlVertexDescriptor.attributes[0].offset = 0
         mtlVertexDescriptor.attributes[0].bufferIndex = 0
         
-        mtlVertexDescriptor.attributes[1].format = MTLVertexFormat.float2   // txt
+        mtlVertexDescriptor.attributes[1].format = .float2   // txt
         mtlVertexDescriptor.attributes[1].offset = 0
         mtlVertexDescriptor.attributes[1].bufferIndex = 1
         
         mtlVertexDescriptor.layouts[0].stride = 12
         mtlVertexDescriptor.layouts[0].stepRate = 1
-        mtlVertexDescriptor.layouts[0].stepFunction = MTLVertexStepFunction.perVertex
+        mtlVertexDescriptor.layouts[0].stepFunction = .perVertex
         
         mtlVertexDescriptor.layouts[1].stride = 8
         mtlVertexDescriptor.layouts[1].stepRate = 1
-        mtlVertexDescriptor.layouts[1].stepFunction = MTLVertexStepFunction.perVertex
+        mtlVertexDescriptor.layouts[1].stepFunction = .perVertex
         
         return mtlVertexDescriptor
     }
@@ -108,7 +107,7 @@ class Renderer: NSObject, MTKViewDelegate {
     //MARK:-
     
     func draw(in view: MTKView) {
-        _ = inFlightSemaphore.wait(timeout: DispatchTime.distantFuture)
+        _ = inFlightSemaphore.wait(timeout: .distantFuture)
         
         guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
         

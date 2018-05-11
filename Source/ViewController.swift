@@ -70,26 +70,14 @@ class ViewController: UIViewController {
             return r
         }
 
-        if wxs > wys {    // landscape
-            mtkViewL.frame = CGRect(x:0, y:0, width:wxs/2, height:wys-200)
-            mtkViewR.frame = CGRect(x:wxs/2, y:0, width:wxs/2, height:wys-200)
+        mtkViewL.frame = CGRect(x:0, y:0, width:wxs/2, height:wys-200)
+        mtkViewR.frame = CGRect(x:wxs/2, y:0, width:wxs/2, height:wys-200)
 
-            x = 0
-            y = wys-190
-            for g in gList { g.frame = frame(170,100,180,0) }
-            infoButton.frame = frame(40,40,0,50)
-            resetButton.frame = frame(80,40,0,0)
-        }
-        else { // portrait
-            mtkViewL.frame = CGRect(x:0, y:0, width:wxs/2, height:wys-200)
-            mtkViewR.frame = CGRect(x:wxs/2, y:0, width:wxs/2, height:wys-200)
-            
-            x = 0
-            y = wys-190
-            for g in gList { g.frame = frame(170,100,180,0) }
-            infoButton.frame = frame(40,40,0,50)
-            resetButton.frame = frame(45,40,0,0)
-        }
+        x = 0
+        y = wys-190
+        for g in gList { g.frame = frame(170,100,180,0) }
+        infoButton.frame = frame(40,40,0,50)
+        resetButton.frame = frame(80,40,0,0)
         
         let hk = mtkViewL.bounds
         arcBall.initialize(Float(hk.size.width),Float(hk.size.height))

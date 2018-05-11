@@ -13,9 +13,9 @@ class DeltaView: UIView {
     var valuePointerY:UnsafeMutableRawPointer! = nil
     var deltaValue:Float = 0
     var name:String = "name"
-    
+
     var mRange = float2(0,256)
-    
+
     func initializeFloats(_ vx:UnsafeMutableRawPointer, _ vy:UnsafeMutableRawPointer, _ min:Float, _ max:Float,  _ delta:Float, _ iname:String) {
         valuePointerX = vx
         valuePointerY = vy
@@ -24,21 +24,21 @@ class DeltaView: UIView {
         deltaValue = delta
         name = iname
         boundsChanged()
-        
+
         let tap2 = UITapGestureRecognizer(target: self, action: #selector(self.handleTap2(_:)))
         tap2.numberOfTapsRequired = 2
         addGestureRecognizer(tap2)
-        
+
         let tap3 = UITapGestureRecognizer(target: self, action: #selector(self.handleTap3(_:)))
         tap3.numberOfTapsRequired = 3
         addGestureRecognizer(tap3)
-        
+
         isUserInteractionEnabled = true
     }
 
     @objc func handleTap2(_ sender: UITapGestureRecognizer) {
         fastEdit = !fastEdit
-        
+
         deltaX = 0
         deltaY = 0
         setNeedsDisplay()
@@ -46,39 +46,39 @@ class DeltaView: UIView {
 
     @objc func handleTap3(_ sender: UITapGestureRecognizer) {
         if valuePointerX == nil || valuePointerY == nil { return }
-        
+
         let value:Float = 0
         if let valuePointerX = valuePointerX { valuePointerX.storeBytes(of:value, as:Float.self) }
         if let valuePointerY = valuePointerY { valuePointerY.storeBytes(of:value, as:Float.self) }
-        
+
         deltaX = 0
         deltaY = 0
         setNeedsDisplay()
     }
-    
+
     func highlight(_ x:CGFloat, _ y:CGFloat) {
         highLightPoint.x = x
         highLightPoint.y = y
     }
-    
+
     func setActive(_ v:Bool) {
         active = v
         setNeedsDisplay()
     }
-    
+
     func percentX(_ percent:CGFloat) -> CGFloat { return CGFloat(bounds.size.width) * percent }
-  
+
     func boundsChanged() {
         swidth = Float(bounds.width)
         scenter = swidth / 2
         setNeedsDisplay()
     }
-    
+
     //MARK: ==================================
-    
+
     override func draw(_ rect: CGRect) {
         context = UIGraphicsGetCurrentContext()
-        
+
         if !active {
             let G:CGFloat = 0.13        // color Lead
             UIColor(red:G, green:G, blue:G, alpha: 1).set()
@@ -92,7 +92,7 @@ class DeltaView: UIView {
 
         if fastEdit { nrmColorFast.set() } else { nrmColorSlow.set() }
         UIBezierPath(rect:bounds).fill()
-        
+
         if isMinValue(0) {  // X coord
             limColor.set()
             var r = bounds
@@ -106,7 +106,7 @@ class DeltaView: UIView {
             r.size.width /= 2
             UIBezierPath(rect:r).fill()
         }
-        
+
         if isMaxValue(1) {  // Y coord
             limColor.set()
             var r = bounds
@@ -130,15 +130,15 @@ class DeltaView: UIView {
         ctx.addPath(path.cgPath)
         ctx.strokePath()
         ctx.restoreGState()
-        
+
         UIColor.black.set()
         context?.setLineWidth(2)
-        
+
         drawVLine(CGFloat(scenter),0,bounds.height)
         drawHLine(0,bounds.width,CGFloat(scenter))
-        
+
         drawText(10,8,.lightGray,16,name)
-        
+
 //        // values ------------------------------------------
 //        if valuePointerX != nil {
 //            func formatted(_ v:Float) -> String { return String(format:"%6.4f",v) }
@@ -167,17 +167,17 @@ class DeltaView: UIView {
 //                coloredValue(yy,28)
 //            }
 //        }
-        
+
         // cursor -------------------------------------------------
         UIColor.black.set()
         context?.setLineWidth(2)
-        
+
         let x = valueRatio(0) * bounds.width
         let y = (CGFloat(1) - valueRatio(1)) * bounds.height
         drawFilledCircle(CGPoint(x:x,y:y),15,UIColor.black.cgColor)
-        
+
         // highlight --------------------------------------
-        
+
         if highLightPoint.x != 0 {
             let den = CGFloat(mRange.y - mRange.x)
             if den != 0 {
@@ -185,23 +185,23 @@ class DeltaView: UIView {
                 let vy:CGFloat = (highLightPoint.y - CGFloat(mRange.x)) / den
                 let x = CGFloat(vx) * bounds.width
                 let y = (CGFloat(1) - vy) * bounds.height
-                
+
                 drawFilledCircle(CGPoint(x:x,y:y),4,UIColor.lightGray.cgColor)
             }
         }
-        
+
     }
-    
+
     func fClamp2(_ v:Float, _ range:float2) -> Float {
         if v < range.x { return range.x }
         if v > range.y { return range.y }
         return v
     }
-    
+
     var deltaX:Float = 0
     var deltaY:Float = 0
     var touched = false
-    
+
     //MARK: ==================================
 
     func getValue(_ who:Int) -> Float {
@@ -214,30 +214,30 @@ class DeltaView: UIView {
             return valuePointerY.load(as: Float.self)
         }
     }
-    
+
     func isMinValue(_ who:Int) -> Bool {
         if valuePointerX == nil { return false }
-        
+
         return getValue(who) == mRange.x
     }
-    
+
     func isMaxValue(_ who:Int) -> Bool {
         if valuePointerX == nil { return false }
-        
+
         return getValue(who) == mRange.y
     }
-    
+
     func valueRatio(_ who:Int) -> CGFloat {
         let den = mRange.y - mRange.x
         if den == 0 { return CGFloat(0) }
         return CGFloat((getValue(who) - mRange.x) / den )
     }
-    
+
     //MARK: ==================================
-    
+
     func update() -> Bool {
         if valuePointerX == nil || valuePointerY == nil || !active || !touched { return false }
-        
+
         let valueX = fClamp2(getValue(0) + deltaX * deltaValue, mRange)
         let valueY = fClamp2(getValue(1) + deltaY * deltaValue, mRange)
 
@@ -247,19 +247,19 @@ class DeltaView: UIView {
         setNeedsDisplay()
         return true
     }
-    
+
     //MARK: ==================================
-    
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if !active { return }
         if valuePointerX == nil || valuePointerY == nil { return }
-        
+
         for t in touches {
             let pt = t.location(in: self)
 
             deltaX = +(Float(pt.x) - scenter) / swidth / 10
             deltaY = -(Float(pt.y) - scenter) / swidth / 10
-            
+
             if !fastEdit {
                 deltaX /= 1000
                 deltaY /= 1000
@@ -269,23 +269,23 @@ class DeltaView: UIView {
             setNeedsDisplay()
         }
     }
-    
+
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) { touchesBegan(touches, with:event) }
-    
+
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         touched = false
     }
-    
+
     func drawLine(_ p1:CGPoint, _ p2:CGPoint) {
         context?.beginPath()
         context?.move(to:p1)
         context?.addLine(to:p2)
         context?.strokePath()
     }
-    
+
     func drawVLine(_ x:CGFloat, _ y1:CGFloat, _ y2:CGFloat) { drawLine(CGPoint(x:x,y:y1),CGPoint(x:x,y:y2)) }
     func drawHLine(_ x1:CGFloat, _ x2:CGFloat, _ y:CGFloat) { drawLine(CGPoint(x:x1, y:y),CGPoint(x: x2, y:y)) }
-    
+
     func drawFilledCircle(_ center:CGPoint, _ diameter:CGFloat, _ color:CGColor) {
         context?.beginPath()
         context?.addEllipse(in: CGRect(x:CGFloat(center.x - diameter/2), y:CGFloat(center.y - diameter/2), width:CGFloat(diameter), height:CGFloat(diameter)))

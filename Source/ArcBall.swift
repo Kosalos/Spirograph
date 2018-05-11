@@ -94,7 +94,7 @@ class ArcBall {
         return ans
     }
     
-    func matrix3fSetIdentity()  -> float3x3 { return float3x3.init(diagonal: float3(1,1,1)) }
+    func matrix3fSetIdentity()  -> float3x3 { return float3x3(diagonal: float3(1,1,1)) }
     func vector3fDot(_ v1 :float3, _ v2:float3) -> Float {  return Float(v1.x*v2.x + v1.y*v2.y + v1.z*v2.z) }
     func vector3fLengthSquared(_ v:float3) -> Float { return Float(v.x*v.x + v.y*v.y + v.z*v.z) }
     func vector3fLength(_ v:float3) -> Float { return sqrtf( vector3fLengthSquared(v)) }

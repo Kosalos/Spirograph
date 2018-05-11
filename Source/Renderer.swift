@@ -28,7 +28,7 @@ class Renderer: NSObject, MTKViewDelegate {
         
         let uniformBufferSize = alignedUniformsSize * maxBuffersInFlight
         
-        guard let buffer = gDevice.makeBuffer(length:uniformBufferSize, options:[MTLResourceOptions.storageModeShared]) else { return nil }
+        guard let buffer = gDevice.makeBuffer(length:uniformBufferSize, options: .storageModeShared) else { return nil }
         dynamicUniformBuffer = buffer
         
         self.dynamicUniformBuffer.label = "UniformBuffer"
@@ -156,10 +156,10 @@ func matrix_perspective_right_hand(fovyRadians fovy: Float, aspectRatio: Float, 
     let ys = 1 / tanf(fovy * 0.5)
     let xs = ys / aspectRatio
     let zs = farZ / (nearZ - farZ)
-    return matrix_float4x4.init(columns:(vector_float4(xs,  0, 0,   0),
-                                         vector_float4( 0, ys, 0,   0),
-                                         vector_float4( 0,  0, zs, -1),
-                                         vector_float4( 0,  0, zs * nearZ, 0)))
+    return matrix_float4x4(columns:(vector_float4(xs,  0, 0,   0),
+                                    vector_float4( 0, ys, 0,   0),
+                                    vector_float4( 0,  0, zs, -1),
+                                    vector_float4( 0,  0, zs * nearZ, 0)))
 }
 
 func radians_from_degrees(_ degrees: Float) -> Float {

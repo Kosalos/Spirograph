@@ -1,7 +1,7 @@
 #pragma once
 #include <simd/simd.h>
 
-#define NUMGEAR 3
+#define NUMGEAR 4
 #define PI2 (3.141592654 * 2.0)
 
 struct Counter {

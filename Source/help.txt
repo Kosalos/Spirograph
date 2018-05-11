@@ -1,0 +1,31 @@
+Spirograph
+
+3D spirograph uses Metal to calculate the data points.
+
+All the widget boxes work the same way:
+Press and hold to either side of center to affect the parameter in the specified direction and speed.
+Tap on a widget to zero it's parameters.
+
+R,S control the size and speed of a point rotating round a clock face.
+X,Y control the rate at which the clock face itself is slowly spinning.
+
+A. R,S widget controls Radius and Speed.
+B. X,Y widget controls speed of rotation around X and Y axes.
+C. "A" toggles gear active / inactive.
+D. "H" alters parameters to nearest 'harmonic value'.  Sort of works...
+
+1600 points are calculated, and connected by lines.
+
+Assuming all 4 gears are active:
+The first gear determines where the point is in relation to the center of the image.
+The 2nd gears' point is in relation to the first gears' point.
+The 3rd gears' point is in relation to the 2nd gears' point.
+The 4rd gears' point is in relation to the 3rd gears' point.
+
+Pinch images for zoom, 2 finger swipe to Pan, 1 finger to rotate.
+Tap image to stop rotation.
+
+Image is rendered twice, for 'cross-eyed' 3D viewing.
+With the iPad held two feet away,
+slightly cross your eyes so that there is a third image in the middle.
+Relax your gaze, and concentrate only on that middle image, which is in 3D.
